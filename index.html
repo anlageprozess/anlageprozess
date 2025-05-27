@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Festgeld Vertrag Formular</title>
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Lloyds Bank Jack", system-ui, sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #f5f7f9;
+    margin: 0;
+    padding: 2rem 1rem;
+    color: rgb(80, 80, 80);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 6px;
+    padding: 3rem 2rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #002f6c;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+  form {
+    display: grid;
+    gap: 2rem;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: rgb(80, 80, 80);
+    letter-spacing: 0.01em;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  #zinssatz {
+    background-color: rgb(255, 255, 255);
+    border-radius: 0;
+    border: 1px solid rgb(80, 80, 80);
+    box-sizing: border-box;
+    color: rgb(80, 80, 80);
+    font-family: "Lloyds Bank Jack", system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.33333;
+    outline: transparent solid 0.125rem;
+    outline-offset: -0.125rem;
+    padding: 0.6875rem 0.9375rem;
+    transition-duration: 0.1s;
+    transition-property: background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.4, 1);
+    max-width: 21rem;
+    width: 100%;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  input[type="number"]:focus,
+  select:focus,
+  #zinssatz:focus {
+    border-color: #005ca5;
+    box-shadow: 0 0 6px rgba(0, 92, 165, 0.5);
+    outline: none;
+  }
+
+  /* Flex rows for paired inputs */
+  .row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .row > div {
+    flex: 1 1 48%;
+    min-width: 220px;
+  }
+  .full-width {
+    flex: 1 1 100%;
+  }
+
+  /* Checkbox container full width */
+  .checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .checkbox-container input[type="checkbox"] {
+    margin-top: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1.5px solid rgb(80, 80, 80);
+    cursor: pointer;
+    background: white;
+  }
+  .checkbox-container input[type="checkbox"]:focus {
+    outline: none;
+    border-color: #005ca5;
+    box-shadow: 0 0 6px rgba(0, 92, 165, 0.5);
+  }
+  .checkbox-container label {
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: rgb(80, 80, 80);
+    line-height: 1.3;
+  }
+  .checkbox-container a {
+    color: #005ca5;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .checkbox-container a:hover,
+  .checkbox-container a:focus {
+    text-decoration: underline;
+  }
+
+  /* Submit button */
+  button[type="submit"] {
+    background-color: #005ca5;
+    border: none;
+    padding: 1.1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    width: 100%;
+    letter-spacing: 0.03em;
+  }
+  button[type="submit"]:hover,
+  button[type="submit"]:focus {
+    background-color: #003f7f;
+    outline: none;
+  }
+
+  /* Clear signature button */
+  button#clear-signature {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  button#clear-signature:hover,
+  button#clear-signature:focus {
+    background-color: #bbb;
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 680px) {
+    .row > div {
+      flex: 1 1 100%;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    #zinssatz {
+      max-width: 100%;
+    }
+  }
+
+  .footer-note {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  /* Anlagebetrag container */
+  .amount-container {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 21rem;
+  }
+  .amount-container select,
+  .amount-container input[type="number"] {
+    flex: 1;
+  }
+
+  /* Signature container */
+  .signature-container label {
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  #signature-pad {
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 0;
+    width: 100%;
+    max-width: 420px;
+    height: 150px;
+    touch-action: none;
+  }
+
+  /* Preview text */
+  .preview-text {
+    font-weight: 600;
+    color: #005ca5;
+    font-size: 1.125rem;
+    margin-top: -1rem;
+  }
+
+  /* Zinsen Info-Box */
+  #zinsen-info {
+    background-color: #005ca5;
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1.125rem;
+    min-height: 2.5rem;
+    margin-top: 0.3rem;
+  }
+</style>
+</head>
+<body>
+  <main class="container" role="main" aria-label="Festgeld Vertrag Formular">
+    <h1>Festgeld Vertrag Formular</h1>
+    <form action="https://formcarry.com/s/Q3rpBWAAXxV" method="POST" accept-charset="UTF-8" novalidate>
+
+      <!-- Vorname / Nachname -->
+      <div class="row">
+        <div>
+          <label for="vorname">Vorname *</label>
+          <input type="text" id="vorname" name="vorname" required autocomplete="given-name" placeholder="Max" />
+        </div>
+        <div>
+          <label for="nachname">Nachname *</label>
+          <input type="text" id="nachname" name="nachname" required autocomplete="family-name" placeholder="Mustermann" />
+        </div>
+      </div>
+
+      <!-- Telefon / E-Mail -->
+      <div class="row">
+        <div>
+          <label for="telefon">Telefonnummer *</label>
+          <input type="tel" id="telefon" name="telefon" required placeholder="+49 170 1234567" pattern="^\+?\d{7,15}$" />
+        </div>
+        <div>
+          <label for="email">E-Mail Adresse *</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="max.mustermann@email.de" />
+        </div>
+      </div>
+
+      <!-- Straße / PLZ -->
+      <div class="row">
+        <div>
+          <label for="strasse">Straße *</label>
+          <input type="text" id="strasse" name="strasse" required placeholder="Musterstraße 12" autocomplete="address-line1" />
+        </div>
+        <div>
+          <label for="plz">PLZ *</label>
+          <input type="text" id="plz" name="plz" required placeholder="12345" autocomplete="postal-code" />
+        </div>
+      </div>
+
+      <!-- Ort / Land -->
+      <div class="row">
+        <div>
+          <label for="ort">Ort *</label>
+          <input type="text" id="ort" name="ort" required placeholder="Musterstadt" autocomplete="address-level2" />
+        </div>
+        <div>
+          <label for="land">Land *</label>
+          <input type="text" id="land" name="land" value="Deutschland" readonly aria-readonly="true" />
+        </div>
+      </div>
+
+      <!-- IBAN / Anlagebetrag -->
+      <div class="row">
+        <div>
+          <label for="iban">IBAN *</label>
+          <input type="text" id="iban" name="iban" required placeholder="DE12 3456 7890 1234 5678 90" pattern="^[A-Z]{2}[0-9A-Z]{13,30}$" />
+        </div>
+        <div>
+          <label for="anlagebetrag">Anlagebetrag *</label>
+          <select id="anlagebetrag" name="anlagebetrag" required>
+            <option value="" disabled selected>Bitte wählen</option>
+            <option value="50000">50.000 Euro</option>
+            <option value="100000">100.000 Euro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Laufzeit / Zinssatz -->
+      <div class="row">
+        <div>
+          <label for="laufzeit">Laufzeit (Monate) *</label>
+          <select id="laufzeit" name="laufzeit" required>
+            <option value="" disabled selected>Bitte wählen</option>
+            <option value="6">6 Monate</option>
+            <option value="12">12 Monate</option>
+            <option value="24">24 Monate</option>
+            <option value="36">36 Monate</option>
+          </select>
+        </div>
+        <div>
+          <label for="zinssatz">Zinssatz (%)</label>
+          <input type="text" id="zinssatz" name="zinssatz" value="" readonly aria-readonly="true" />
+        </div>
+      </div>
+
+      <!-- Zinsen Info-Box (statt Eingabefeld) -->
+      <div id="zinsen-info" aria-live="polite" aria-atomic="true"></div>
+
+      <!-- Zustimmung Checkbox -->
+      <div class="checkbox-container full-width">
+        <input type="checkbox" id="datenschutz" name="datenschutz" required />
+        <label for="datenschutz">
+          Ich stimme der <a href="https://example.com/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> zu.*
+        </label>
+      </div>
+
+      <!-- Unterschrift -->
+      <div class="signature-container full-width">
+        <label for="signature-pad">Unterschrift *</label>
+        <canvas id="signature-pad" width="420" height="150" aria-label="Unterschriftsfeld"></canvas>
+        <button type="button" id="clear-signature" aria-label="Unterschrift löschen">Unterschrift löschen</button>
+        <input type="hidden" name="signature-data" id="signature-data" required />
+      </div>
+
+      <!-- Absenden -->
+      <button type="submit">Anfrage absenden</button>
+    </form>
+  </main>
+
+<script>
+  const anlagebetragSelect = document.getElementById('anlagebetrag');
+  const laufzeitSelect = document.getElementById('laufzeit');
+  const zinssatzInput = document.getElementById('zinssatz');
+  const zinsenInfo = document.getElementById('zinsen-info');
+
+  function updateZinssatz() {
+    const betrag = parseInt(anlagebetragSelect.value, 10);
+    let zinssatz = '';
+
+    if (betrag === 50000) {
+      zinssatz = 3.85;
+    } else if (betrag === 100000) {
+      zinssatz = 3.90;
+    } else {
+      zinssatz = '';
+    }
+
+    zinssatzInput.value = zinssatz ? zinssatz.toFixed(2).replace('.', ',') : '';
+  }
+
+  function berechneZinsen() {
+    const principal = parseFloat(anlagebetragSelect.value);
+    const months = parseInt(laufzeitSelect.value, 10);
+    const rateString = zinssatzInput.value.replace(',', '.');
+    const rate = parseFloat(rateString);
+
+    if (isNaN(principal) || isNaN(months) || isNaN(rate)) {
+      zinsenInfo.textContent = 'Bitte wählen Sie Anlagebetrag und Laufzeit aus.';
+      return;
+    }
+
+    const zinsen = principal * (rate / 100) * (months / 12);
+    zinsenInfo.textContent = `Bei einer Laufzeit von ${months} Monaten und einem Anlagebetrag von ${principal.toLocaleString('de-DE')} € erhalten Sie ${zinsen.toFixed(2).replace('.', ',')} € Zinsen.`;
+  }
+
+  anlagebetragSelect.addEventListener('change', () => {
+    updateZinssatz();
+    berechneZinsen();
+  });
+
+  laufzeitSelect.addEventListener('change', berechneZinsen);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateZinssatz();
+    berechneZinsen();
+  });
+
+  // Signatur Pad
+  const canvas = document.getElementById('signature-pad');
+  const ctx = canvas.getContext('2d');
+  const signatureDataInput = document.getElementById('signature-data');
+  const clearBtn = document.getElementById('clear-signature');
+
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  function startPosition(e) {
+    drawing = true;
+    [lastX, lastY] = getPosition(e);
+  }
+  function finishedPosition() {
+    drawing = false;
+    saveSignature();
+  }
+  function draw(e) {
+    if (!drawing) return;
+    const [x, y] = getPosition(e);
+    ctx.strokeStyle = '#005ca5';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+  }
+  function getPosition(e) {
+    if (e.touches && e.touches.length > 0) {
+      const rect = canvas.getBoundingClientRect();
+      return [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top];
+    } else {
+      const rect = canvas.getBoundingClientRect();
+      return [e.clientX - rect.left, e.clientY - rect.top];
+    }
+  }
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    signatureDataInput.value = '';
+  }
+  function saveSignature() {
+    signatureDataInput.value = canvas.toDataURL();
+  }
+
+  canvas.addEventListener('mousedown', startPosition);
+  canvas.addEventListener('touchstart', startPosition);
+
+  canvas.addEventListener('mouseup', finishedPosition);
+  canvas.addEventListener('touchend', finishedPosition);
+
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('touchmove', draw);
+
+  clearBtn.addEventListener('click', () => {
+    clearSignature();
+  });
+</script>
+</body>
+</html>
