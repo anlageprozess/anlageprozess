@@ -318,142 +318,205 @@
         </div>
         <div>
           <label for="zinssatz">Zinssatz (%)</label>
-          <input type="text" id="zinssatz" name="zinssatz" value="" readonly aria-readonly="true" />
+          <input type="text" id="zinssatz" name="zinssatz" readonly aria-readonly="true" />
         </div>
       </div>
 
-      <!-- Zinsen Info-Box (statt Eingabefeld) -->
-      <div id="zinsen-info" aria-live="polite" aria-atomic="true"></div>
+      <!-- Zinsen -->
+      <div>
+        <label for="zinsen">Erwartete Zinsen (Euro)</label>
+        <div id="zinsen-info">0,00 €</div>
+      </div>
 
-      <!-- Zustimmung Checkbox -->
-      <div class="checkbox-container full-width">
+      <!-- Signature -->
+      <div class="signature-container">
+        <label for="signature-pad">Unterschrift *</label>
+        <canvas id="signature-pad" aria-label="Unterschrift hier zeichnen" tabindex="0"></canvas>
+        <button type="button" id="clear-signature" aria-label="Unterschrift löschen">Unterschrift löschen</button>
+        <input type="hidden" id="signature-data" name="signature_data" />
+      </div>
+
+      <!-- Datenschutz Checkbox -->
+      <div class="checkbox-container">
         <input type="checkbox" id="datenschutz" name="datenschutz" required />
         <label for="datenschutz">
-          Ich stimme der <a href="https://example.com/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> zu.*
+          Ich habe die <a href="https://www.lloydsbank.de/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> gelesen und akzeptiere sie.
         </label>
       </div>
 
-      <!-- Unterschrift -->
-      <div class="signature-container full-width">
-        <label for="signature-pad">Unterschrift *</label>
-        <canvas id="signature-pad" width="420" height="150" aria-label="Unterschriftsfeld"></canvas>
-        <button type="button" id="clear-signature" aria-label="Unterschrift löschen">Unterschrift löschen</button>
-        <input type="hidden" name="signature-data" id="signature-data" required />
-      </div>
-
-      <!-- Absenden -->
-      <button type="submit">Anfrage absenden</button>
+      <!-- Submit Button -->
+      <button type="submit">Absenden</button>
     </form>
+    <div class="footer-note">
+      * Pflichtfelder
+    </div>
   </main>
 
-<script>
-  const anlagebetragSelect = document.getElementById('anlagebetrag');
-  const laufzeitSelect = document.getElementById('laufzeit');
-  const zinssatzInput = document.getElementById('zinssatz');
-  const zinsenInfo = document.getElementById('zinsen-info');
+  <script>
+    // DOM references
+    const anlagebetragSelect = document.getElementById('anlagebetrag');
+    const laufzeitSelect = document.getElementById('laufzeit');
+    const zinssatzInput = document.getElementById('zinssatz');
+    const zinsenInfo = document.getElementById('zinsen-info');
+    const signatureDataInput = document.getElementById('signature-data');
+    const canvas = document.getElementById('signature-pad');
+    const clearButton = document.getElementById('clear-signature');
+    const form = document.querySelector('form');
 
-  function updateZinssatz() {
-    const betrag = parseInt(anlagebetragSelect.value, 10);
-    let zinssatz = '';
+    // Canvas setup for signature
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let lastX = 0;
+    let lastY = 0;
 
-    if (betrag === 50000) {
-      zinssatz = 3.85;
-    } else if (betrag === 100000) {
-      zinssatz = 3.90;
-    } else {
-      zinssatz = '';
+    function resizeCanvas() {
+      // Save current image
+      const data = canvas.toDataURL();
+
+      // Adjust for high DPI screens
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.style.width = canvas.offsetWidth + 'px';
+      canvas.style.height = canvas.offsetHeight + 'px';
+      ctx.scale(ratio, ratio);
+
+      // Restore image
+      const image = new Image();
+      image.src = data;
+      image.onload = () => ctx.drawImage(image, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function startDrawing(e) {
+      drawing = true;
+      [lastX, lastY] = getXY(e);
+      e.preventDefault();
+    }
+    function stopDrawing(e) {
+      drawing = false;
+      saveSignature();
+      e.preventDefault();
+    }
+    function draw(e) {
+      if (!drawing) return;
+      const [x, y] = getXY(e);
+      ctx.strokeStyle = '#005ca5';
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      [lastX, lastY] = [x, y];
+      e.preventDefault();
+    }
+    function getXY(e) {
+      let rect = canvas.getBoundingClientRect();
+      if (e.touches && e.touches.length > 0) {
+        return [
+          e.touches[0].clientX - rect.left,
+          e.touches[0].clientY - rect.top,
+        ];
+      } else {
+        return [
+          e.clientX - rect.left,
+          e.clientY - rect.top,
+        ];
+      }
+    }
+    function saveSignature() {
+      const dataUrl = canvas.toDataURL();
+      // If the canvas is blank, don't save the data
+      if (isCanvasBlank(canvas)) {
+        signatureDataInput.value = '';
+      } else {
+        signatureDataInput.value = dataUrl;
+      }
+    }
+    function isCanvasBlank(cnv) {
+      const blank = document.createElement('canvas');
+      blank.width = cnv.width;
+      blank.height = cnv.height;
+      return cnv.toDataURL() === blank.toDataURL();
+    }
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      signatureDataInput.value = '';
     }
 
-    zinssatzInput.value = zinssatz ? zinssatz.toFixed(2).replace('.', ',') : '';
-  }
+    // Signature event listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    clearButton.addEventListener('click', () => {
+      clearSignature();
+      canvas.focus();
+    });
 
-  function berechneZinsen() {
-    const principal = parseFloat(anlagebetragSelect.value);
-    const months = parseInt(laufzeitSelect.value, 10);
-    const rateString = zinssatzInput.value.replace(',', '.');
-    const rate = parseFloat(rateString);
+    // Update Zinssatz based on amount and term
+    function updateZinssatz() {
+      const betrag = parseInt(anlagebetragSelect.value, 10);
+      const laufzeit = parseInt(laufzeitSelect.value, 10);
+      let zinssatz = '';
 
-    if (isNaN(principal) || isNaN(months) || isNaN(rate)) {
-      zinsenInfo.textContent = 'Bitte wählen Sie Anlagebetrag und Laufzeit aus.';
-      return;
+      if (betrag === 50000) {
+        if (laufzeit === 6) zinssatz = 3.80;
+        else if (laufzeit === 12) zinssatz = 3.85;
+        else if (laufzeit === 24) zinssatz = 3.90;
+        else if (laufzeit === 36) zinssatz = 3.95;
+      } else if (betrag === 100000) {
+        if (laufzeit === 6) zinssatz = 3.85;
+        else if (laufzeit === 12) zinssatz = 3.90;
+        else if (laufzeit === 24) zinssatz = 3.95;
+        else if (laufzeit === 36) zinssatz = 4.00;
+      } else {
+        zinssatz = '';
+      }
+
+      zinssatzInput.value = zinssatz ? zinssatz.toFixed(2).replace('.', ',') : '';
     }
 
-    const zinsen = principal * (rate / 100) * (months / 12);
-    zinsenInfo.textContent = `Bei einer Laufzeit von ${months} Monaten und einem Anlagebetrag von ${principal.toLocaleString('de-DE')} € erhalten Sie ${zinsen.toFixed(2).replace('.', ',')} € Zinsen.`;
-  }
+    // Calculate interest
+    function berechneZinsen() {
+      const betrag = parseInt(anlagebetragSelect.value, 10);
+      const laufzeit = parseInt(laufzeitSelect.value, 10);
+      let zinssatz = parseFloat(zinssatzInput.value.replace(',', '.'));
 
-  anlagebetragSelect.addEventListener('change', () => {
-    updateZinssatz();
-    berechneZinsen();
-  });
-
-  laufzeitSelect.addEventListener('change', berechneZinsen);
-
-  document.addEventListener('DOMContentLoaded', () => {
-    updateZinssatz();
-    berechneZinsen();
-  });
-
-  // Signatur Pad
-  const canvas = document.getElementById('signature-pad');
-  const ctx = canvas.getContext('2d');
-  const signatureDataInput = document.getElementById('signature-data');
-  const clearBtn = document.getElementById('clear-signature');
-
-  let drawing = false;
-  let lastX = 0;
-  let lastY = 0;
-
-  function startPosition(e) {
-    drawing = true;
-    [lastX, lastY] = getPosition(e);
-  }
-  function finishedPosition() {
-    drawing = false;
-    saveSignature();
-  }
-  function draw(e) {
-    if (!drawing) return;
-    const [x, y] = getPosition(e);
-    ctx.strokeStyle = '#005ca5';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    [lastX, lastY] = [x, y];
-  }
-  function getPosition(e) {
-    if (e.touches && e.touches.length > 0) {
-      const rect = canvas.getBoundingClientRect();
-      return [e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top];
-    } else {
-      const rect = canvas.getBoundingClientRect();
-      return [e.clientX - rect.left, e.clientY - rect.top];
+      if (!isNaN(betrag) && !isNaN(laufzeit) && !isNaN(zinssatz)) {
+        // Simple interest calculation: principal * rate * (months/12) / 100
+        const zinsen = (betrag * zinssatz * laufzeit) / (12 * 100);
+        zinsenInfo.textContent = zinsen.toFixed(2).replace('.', ',') + ' €';
+      } else {
+        zinsenInfo.textContent = '0,00 €';
+      }
     }
-  }
-  function clearSignature() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    signatureDataInput.value = '';
-  }
-  function saveSignature() {
-    signatureDataInput.value = canvas.toDataURL();
-  }
 
-  canvas.addEventListener('mousedown', startPosition);
-  canvas.addEventListener('touchstart', startPosition);
+    anlagebetragSelect.addEventListener('change', () => {
+      updateZinssatz();
+      berechneZinsen();
+    });
+    laufzeitSelect.addEventListener('change', () => {
+      updateZinssatz();
+      berechneZinsen();
+    });
 
-  canvas.addEventListener('mouseup', finishedPosition);
-  canvas.addEventListener('touchend', finishedPosition);
+    // Prevent submit if signature is missing
+    form.addEventListener('submit', (e) => {
+      if (!signatureDataInput.value) {
+        e.preventDefault();
+        alert('Bitte leisten Sie Ihre Unterschrift, bevor Sie das Formular absenden.');
+        canvas.focus();
+      }
+    });
 
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('touchmove', draw);
-
-  clearBtn.addEventListener('click', () => {
-    clearSignature();
-  });
-</script>
+  </script>
 </body>
 </html>
